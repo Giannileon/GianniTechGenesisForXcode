@@ -1,0 +1,22 @@
+import numpy as np
+
+# Recursive function for G_FMM
+def G_FMM(x, t, alpha=1.23, beta=2.34, gamma=3.45, depth=5):
+    result = 0
+    for n in range(1, depth + 1):
+        term1 = alpha * np.exp(1j * (n * x**2 - t))
+        term2 = beta * np.sin(n * x)
+        term3 = gamma * np.cos(np.pi * n * x / 2)
+        result += (term1 + term2 + term3).real  # Use .real for numerical stability
+    return result
+
+# Self-referencing function for Phi_FMM
+def Phi_FMM(x, G_FMM_value, own_factor=1.5):
+    adjustment = sum(1 / (x + j)**own_factor for j in range(1, 6))
+    return G_FMM_value + adjustment
+
+# Adaptive refinement function for A_FMM
+def A_FMM(x, t, theta=1.0):
+    G_value = G_FMM(x, t)
+    Phi_value = Phi_FMM(x, G_value)
+    return (G_value + Phi_value) * theta
